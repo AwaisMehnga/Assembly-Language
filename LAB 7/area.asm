@@ -1,8 +1,8 @@
 .model small
 .data
-height db ?
-wid db ?
-area db ?
+height dw ?
+wid dw ?
+area dw ?
 wmsg db "Enter width: $"
 hmsg db "Enter height: $"
 result db "Area is: $"
@@ -18,7 +18,8 @@ int 21h
 
 mov ah, 1
 int 21h
-mov [wid],al
+sub ax,'0'
+mov [wid],ax
 
 call newLine
 ; getting height
@@ -28,26 +29,30 @@ int 21h
 
 mov ah, 1
 int 21h
-mov [height],al
+sub ax,'0'
+mov [height],ax
 
 ; calculating area
-mov al, [wid]
-mov bl, [height]
-mul bl  
-mov [result],dl
+xor ax,ax
+mov ax, [wid]
+mov bx, [height]
+mul bx  
+
+mov [area],ax
 
 ; printing result
 call newLine
 mov ah, 9
-mov dx, offset result
+mov dx, offset [result]
 int 21h
 
-mov dl, [result]
+mov dx, [area]
+add dx, '0'
 mov ah, 2h
 int 21h
 
 mov ah, 9
-mov dx, offset unit
+mov dx, offset [unit]
 int 21h
 
 mov ah,4ch
