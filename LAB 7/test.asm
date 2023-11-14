@@ -1,69 +1,69 @@
 .model small
-.stack 100h
-.data 
-sum db 0
-chh dw 0
-num dw 0
-array db 5 dup (?)
-
+.data
+inpTemp db 0
+additive db 0
+promt db "   Binary value is: $"
+msg1 db "1$"
+msg2 db "0$"
 .code
 mov ax,@data
 mov ds,ax
 
-mov si,0
-mov cx,5
-input: 
-mov ah,1
-int 21h   
-mov [array+si],al
-inc si
-loop input
 
-mov si,0
-hi:
+mov [inptemp],0
+        mov [additive],0
+        mov si,-1
+        inp:
+            mov ah,01h
+            int 21h
+            ; if enter exit the loop
+    
+            cmp al,0Dh
+            je TerminateInpLoop
 
-mov bl,[array+si] 
+            inc si
+            sub al,'0'
+            ; if it's first iteration skip next steps
+            cmp si,0
+            je endInpLoop
 
+            ; coverting to number
+        
+            mov [inpTemp],al
+            mov al,[additive]
+            mov bl, 10
+            mul bl
+            add al,[inpTemp]
+            endInpLoop:
+            mov [additive],al
+            
+            mov ax,0
+        jmp inp
+        TerminateInpLoop:
+        mov al,[additive]
+        
 
-mov ax,0
-mov cx,5
-mov di,0
-lopp:
-mov al,[array+di]
-cmp bl,al
-je plus
-again:
-inc di
-loop lopp
+        lea dx,promt
+    mov ah,09h
+    int 21h 
+    mov ah, [additive]
+    mov cx,8
+printloop:
+    shl al,1
+    jc jumpcarry
 
-mov dl,sum
-sub dl,1
-add dl,48 
- 
-cmp dl,'0'
-je check
+    lea dx,msg2
+    mov ah,09h
+    int 21h
+    jmp endloop
 
-mov ah,2
-int 21h 
+jumpcarry:
+    lea dx,msg1
+    mov ah,09h
+    int 21h
 
-check:
-inc num
-mov sum,0
-mov si,num 
-
-
-
-cmp num,5
-je done
-jmp hi
-
-done:
-mov ah,4ch
-int 21h
-
-plus:
-inc sum 
-jmp again
-
-
+endloop:
+    loop printloop
+        mov ah,4ch
+        int 21h
 end
